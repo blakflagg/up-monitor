@@ -8,7 +8,10 @@ const handlers = require('./lib/handlers');
 const helpers = require('./lib/helpers');
 
 
-
+/* //@TODO Get rid of this
+helpers.sendTwilioSms('9492853236','Hello',function(err){
+  console.log(err);
+}); */
 
 const httpServer = http.createServer(function (req, res) {
   unifiedServer(req,res);
