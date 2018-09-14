@@ -17,7 +17,7 @@ const path = require('path');
 let server = {};
 
 server.httpServer = http.createServer(function (req, res) {
-  unifiedServer(req,res);
+ server.unifiedServer(req,res);
 });
 
 server.httpsServerOptions = {
