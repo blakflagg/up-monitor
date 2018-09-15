@@ -9,6 +9,33 @@ const config = require('./config');
 //Define the handlers
 let handlers = {};
 
+
+/*
+* HTML Handlers
+*
+*/
+
+//Index handler
+
+handlers.index = (data,callback)=>{
+  //Reject any request that isn't a GET
+  if(data.method == 'get'){
+    //Read in the index template as a string
+    helpers.getTemplate('index',(err,str)=>{
+      if(!err && str){
+        callback(200,str,'html');
+      }else{
+        callback(500,undefined,'html');
+      }
+    });
+  }else{
+    callback(405,undefined,'html');
+  }
+};
+
+/*
+* JSON API handlers
+*/
 //Users
 
 handlers.users = function (data, callback) {
