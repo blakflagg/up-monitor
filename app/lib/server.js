@@ -12,12 +12,14 @@ const fs = require('fs');
 const handlers = require('./handlers');
 const helpers = require('./helpers');
 const path = require('path');
+const util = require('util');
+const debug = util.debuglog('server');
 
 //Instantiate the server module object
 let server = {};
 
 server.httpServer = http.createServer(function (req, res) {
- server.unifiedServer(req,res);
+  server.unifiedServer(req,res);
 });
 
 server.httpsServerOptions = {
@@ -84,7 +86,15 @@ server.unifiedServer = function (req, res) {
       res.setHeader('Content-Type', 'application/json');
       res.writeHead(statusCode);
       res.end(payloadString);
-      console.log('Returning this response: ', statusCode, payloadString);
+
+      //If the response is 200, print green otherwise print red
+      if(statusCode == 200){
+        debug('\x1b[32m%s\x1b[0m',method.toUpperCase()+'/'+trimmedPath+' '+statusCode);
+      }else{
+
+        debug('\x1b[31m%s\x1b[0m',method.toUpperCase()+'/'+trimmedPath+' '+statusCode);
+      }
+      debug('Returning this response: ', statusCode, payloadString);
 
     });
 
@@ -105,12 +115,12 @@ server.router = {
 server.init = function(){
   //Start the http server
   server.httpServer.listen(config.httpPort, function () {
-    console.log('server listening on port ' + config.httpPort);
+    console.log('\x1b[36m%s\x1b[0m','http server listening on port ' + config.httpPort); //console log is in color
   });
 
   //Start the https server
   server.httpsServer.listen(config.httpsPort, function () {
-    console.log('server listening on port ' + config.httpsPort);
+    console.log('\x1b[35m%s\x1b[0m','https server listening on port ' + config.httpsPort);//console log is in color
   });
 }
 module.exports = server;
