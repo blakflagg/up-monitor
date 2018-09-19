@@ -16,6 +16,12 @@ environments.staging = {
     'accountSid' : 'AC562b51b165da209f92984dcd84e4ffaf',
     'authToken' : 'b5f3657fcacb4e11bcc3c4e5960ddff5',
     'fromPhone' : '+19497633591'
+  },
+  'templateGlobals' : {
+    'appName' : 'UptimeChecker',
+    'companyName' : 'Horizon Lighting, Inc.',
+    'yearCreated' : '2018',
+    'baseUrl' : 'http://localhost:3000/'
   }
 };
 
@@ -29,6 +35,12 @@ environments.production = {
     'accountSid' : 'AC562b51b165da209f92984dcd84e4ffaf',
     'authToken' : 'b5f3657fcacb4e11bcc3c4e5960ddff5',
     'fromPhone' : '+19497633591'
+  },
+  'templateGlobals' : {
+    'appName' : 'UptimeChecker',
+    'companyName' : 'Horizon Lighting, Inc.',
+    'yearCreated' : '2018',
+    'baseUrl' : 'http://localhost:5000/'
   }
 };
 
