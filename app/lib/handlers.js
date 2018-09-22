@@ -17,39 +17,97 @@ let handlers = {};
 
 //Index handler
 
-handlers.index = (data,callback)=>{
+handlers.index = (data, callback) => {
   //Reject any request that isn't a GET
-  if(data.method == 'get'){
+  if (data.method == 'get') {
 
     //Prepare data for interpolation
     let templateData = {
-      'head.title' : 'this is the title',
-      'head.description' : 'this is the meta description',
-      'body.title' : 'Hello, templated world!',
-      'body.class' : 'index'
+      'head.title': 'this is the title',
+      'head.description': 'this is the meta description',
+      'body.title': 'Hello, templated world!',
+      'body.class': 'index'
     };
 
     //Read in the index template as a string
-    helpers.getTemplate('index',templateData,(err,str)=>{
-      if(!err && str){
+    helpers.getTemplate('index', templateData, (err, str) => {
+      if (!err && str) {
         //Add the universal header and footer
-        helpers.addUniversalTemplates(str,templateData,(err,str)=>{
-          if(!err && str){
+        helpers.addUniversalTemplates(str, templateData, (err, str) => {
+          if (!err && str) {
             //return that page as HTML
-            callback(200,str,'html');
-          }else{
-            callback(500, undefined,'html');
+            callback(200, str, 'html');
+          } else {
+            callback(500, undefined, 'html');
           }
         });
-      }else{
-        callback(500,undefined,'html');
+      } else {
+        callback(500, undefined, 'html');
       }
     });
-  }else{
-    callback(405,undefined,'html');
+  } else {
+    callback(405, undefined, 'html');
   }
 };
 
+//Favicon
+handlers.favicon = (data, callback) => {
+  //Reject an request that is not GET
+  if (data.method == 'get') {
+    //Read in the favican's data
+    helpers.getStaticAsset('favicon.ico', (err, data) => {
+      if (!err && data) {
+        callback(200, data, 'favicon');
+      } else {
+        callback(500);
+      }
+    });
+  } else {
+    callback(405)
+  }
+};
+
+//Public Assets
+
+handlers.public = (data, callback) => {
+  //Reject an request that is not GET
+  if (data.method == 'get') {
+    //Get the filename begin requested
+    let trimmedAssetName = data.trimmedPath.replace('public/', '').trim();
+    if (trimmedAssetName.length > 0) {
+      //Read in the assets's data
+      helpers.getStaticAsset(trimmedAssetName, (err, data) => {
+        if(!err && data){
+          //Determine the content type and default to the plain text
+          let contentType = 'plain';
+
+          if(trimmedAssetName.indexOf('.css') > -1){
+            contentType = 'css';
+          }
+          if(trimmedAssetName.indexOf('.png') > -1){
+            contentType = 'png';
+          }
+          if(trimmedAssetName.indexOf('.jpg') > -1){
+            contentType = 'jpg';
+          }
+          if(trimmedAssetName.indexOf('.ico') > -1){
+            contentType = 'favicon';
+          }
+
+          //Callback the data
+          callback(200,data,contentType);
+          
+        }else{
+          callback(404);
+        }
+      });
+    } else {
+      callback(404);
+    }
+  } else {
+    callback(405);
+  }
+};
 /*
 * JSON API handlers
 */
@@ -223,31 +281,31 @@ handlers._users.delete = function (data, callback) {
             _data.delete('users', phone, function (err) {
               if (!err) {
                 //Delete each of the check associated with the user
-                    let userChecks = typeof (userData.checks) == 'object' && userData.checks instanceof Array ? userData.checks : [];
-                    let checksToDelete = userChecks.length;
-                    if(checksToDelete > 0){
-                      let checksDeleted = 0;
-                      let deletionErrors =false;
-                      //Loop through the checks
-                      userChecks.forEach(function(checkId){
-                        //Delete the check
-                        _data.delete('checks',checkId,function(err){
-                          if(err){
-                            deletionErrors = true;
-                          }
-                          checksDeleted++;
-                          if(checksDeleted == checksToDelete){
-                            if(!deletionErrors){
-                              callback(200);
-                            }else{
-                              callback(500,{'Errors':'Errors encountered while trying to delete all checks, all checks may not have been deleted successfully'});
-                            }
-                          }
-                        });
-                      });
-                    }else{
-                      callback(200);
-                    }
+                let userChecks = typeof (userData.checks) == 'object' && userData.checks instanceof Array ? userData.checks : [];
+                let checksToDelete = userChecks.length;
+                if (checksToDelete > 0) {
+                  let checksDeleted = 0;
+                  let deletionErrors = false;
+                  //Loop through the checks
+                  userChecks.forEach(function (checkId) {
+                    //Delete the check
+                    _data.delete('checks', checkId, function (err) {
+                      if (err) {
+                        deletionErrors = true;
+                      }
+                      checksDeleted++;
+                      if (checksDeleted == checksToDelete) {
+                        if (!deletionErrors) {
+                          callback(200);
+                        } else {
+                          callback(500, { 'Errors': 'Errors encountered while trying to delete all checks, all checks may not have been deleted successfully' });
+                        }
+                      }
+                    });
+                  });
+                } else {
+                  callback(200);
+                }
               } else {
                 callback(500, { 'Error': 'Could not delete the specified user' });
               }
