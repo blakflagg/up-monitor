@@ -23,9 +23,8 @@ handlers.index = (data, callback) => {
 
     //Prepare data for interpolation
     let templateData = {
-      'head.title': 'this is the title',
-      'head.description': 'this is the meta description',
-      'body.title': 'Hello, templated world!',
+      'head.title': 'Uptime Monitoring - Made Simple',
+      'head.description': 'up time monitor for HTTP/HTTPS sites',
       'body.class': 'index'
     };
 
