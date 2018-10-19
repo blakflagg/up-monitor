@@ -12,6 +12,7 @@ const os = require('os');
 const v8 = require('v8');
 const _data = require('./data');
 const _logs = require('./logs');
+const helpers = require('./helpers');
 
 class _events extends events { };
 
@@ -74,14 +75,14 @@ cli.responders.exit = () => {
 // Stats 
 cli.responders.stats = () => {
   let stats = {
-    'Load Average' : os.loadavg().join(' '),
-    'CPU Count' : os.cpus().length,
-    'Free Memory' : os.freemem(),
-    'Current Malloced Memory' : v8.getHeapStatistics().malloced_memory,
-    'Peak Malloced Memory' : v8.getHeapStatistics().peak_malloced_memory,
-    'Allocated Heap Used (%)' : Math.round((v8.getHeapStatistics().used_heap_size / v8.getHeapStatistics().total_heap_size) * 100),
-    'Available Heap Allocated (%)' : Math.round((v8.getHeapStatistics().total_heap_size / v8.getHeapStatistics().heap_size_limit) * 100),
-    'Uptime' : os.uptime()+ ' Seconds'
+    'Load Average': os.loadavg().join(' '),
+    'CPU Count': os.cpus().length,
+    'Free Memory': os.freemem(),
+    'Current Malloced Memory': v8.getHeapStatistics().malloced_memory,
+    'Peak Malloced Memory': v8.getHeapStatistics().peak_malloced_memory,
+    'Allocated Heap Used (%)': Math.round((v8.getHeapStatistics().used_heap_size / v8.getHeapStatistics().total_heap_size) * 100),
+    'Available Heap Allocated (%)': Math.round((v8.getHeapStatistics().total_heap_size / v8.getHeapStatistics().heap_size_limit) * 100),
+    'Uptime': os.uptime() + ' Seconds'
   };
   // Show a header for the stats
   cli.horizontalLine();
@@ -112,14 +113,14 @@ cli.responders.stats = () => {
 // List Users
 cli.responders.listUsers = () => {
   _data.list('users', (err, userIds) => {
-    if(!err && userIds && userIds.length > 0){
+    if (!err && userIds && userIds.length > 0) {
       cli.verticalSpace();
-      userIds.forEach((userId) =>{
-        _data.read('users',userId,(err,userData) => {
-          if(!err && userData){
-            let line = 'Name:' +userData.firstName+' '+userData.lastName+' Phone:'+userData.phone+' Checks: '
-            let numberOfChecks = typeof(userData.checks) == 'object' && userData.checks instanceof Array && userData.checks.length > 0 ? userData.checks.length : 0;
-            line+=numberOfChecks;
+      userIds.forEach((userId) => {
+        _data.read('users', userId, (err, userData) => {
+          if (!err && userData) {
+            let line = 'Name:' + userData.firstName + ' ' + userData.lastName + ' Phone:' + userData.phone + ' Checks: '
+            let numberOfChecks = typeof (userData.checks) == 'object' && userData.checks instanceof Array && userData.checks.length > 0 ? userData.checks.length : 0;
+            line += numberOfChecks;
             console.log(line);
             cli.verticalSpace();
           }
@@ -133,18 +134,18 @@ cli.responders.listUsers = () => {
 cli.responders.moreUserInfo = (str) => {
   //Get the ID from the string
   let arr = str.split('--');
-  let userId = typeof(arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false;
-  if(userId){
+  let userId = typeof (arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false;
+  if (userId) {
     //Lookup the user
-    _data.read('users',userId,(err,userData) =>{
-      if(!err && userData){
-      //Remove the hashed password
-      delete userData.hashedPassword;
+    _data.read('users', userId, (err, userData) => {
+      if (!err && userData) {
+        //Remove the hashed password
+        delete userData.hashedPassword;
 
-      //Print the JSON with text highlighting
-      cli.verticalSpace();
-      console.dir(userData,{'colors' : true})
-      cli.verticalSpace();
+        //Print the JSON with text highlighting
+        cli.verticalSpace();
+        console.dir(userData, { 'colors': true })
+        cli.verticalSpace();
       }
 
     })
@@ -153,20 +154,20 @@ cli.responders.moreUserInfo = (str) => {
 
 // List Checks
 cli.responders.listChecks = (str) => {
-  _data.list('checks',(err,checkIds) => {
-    if(!err && checkIds && checkIds.length > 0){
+  _data.list('checks', (err, checkIds) => {
+    if (!err && checkIds && checkIds.length > 0) {
       cli.verticalSpace();
-      checkIds.forEach((checkId) =>{
-        _data.read('checks',checkId,(err,checkData) => {
+      checkIds.forEach((checkId) => {
+        _data.read('checks', checkId, (err, checkData) => {
           let includeCheck = false;
           let lowerString = str.toLowerCase();
           //Get the state, default to down
-          let state = typeof(checkData.state) == 'string' ? checkData.state : 'down';
+          let state = typeof (checkData.state) == 'string' ? checkData.state : 'down';
           //Get the state, default to unknown
-          let stateOrUnknown = typeof(checkData.state) == 'string' ? checkData.state : 'unknown';
+          let stateOrUnknown = typeof (checkData.state) == 'string' ? checkData.state : 'unknown';
           //If the user has specified the state, or hasn't specified any state, include the current check accordingly
-          if(lowerString.indexOf('--'+state) >-1 || (lowerString.indexOf('--down') == -1 && lowerString.indexOf('--up') == -1)){
-            let line = 'ID: '+checkData.id+' '+checkData.method.toUpperCase()+' '+checkData.protocol+'://'+checkData.url+' State: '+stateOrUnknown;
+          if (lowerString.indexOf('--' + state) > -1 || (lowerString.indexOf('--down') == -1 && lowerString.indexOf('--up') == -1)) {
+            let line = 'ID: ' + checkData.id + ' ' + checkData.method.toUpperCase() + ' ' + checkData.protocol + '://' + checkData.url + ' State: ' + stateOrUnknown;
             console.log(line);
             cli.verticalSpace();
           }
@@ -178,31 +179,31 @@ cli.responders.listChecks = (str) => {
 
 // More Check Info
 cli.responders.moreCheckInfo = (str) => {
-    //Get the ID from the string
-    let arr = str.split('--');
-    let checkId = typeof(arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false;
-    if(checkId){
-      //Lookup the check
-      _data.read('checks',checkId,(err,checkData) =>{
-        if(!err && checkData){
-  
+  //Get the ID from the string
+  let arr = str.split('--');
+  let checkId = typeof (arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false;
+  if (checkId) {
+    //Lookup the check
+    _data.read('checks', checkId, (err, checkData) => {
+      if (!err && checkData) {
+
         //Print the JSON with text highlighting
         cli.verticalSpace();
-        console.dir(checkData,{'colors' : true})
+        console.dir(checkData, { 'colors': true })
         cli.verticalSpace();
-        }
-  
-      });
-    }
+      }
+
+    });
+  }
 };
 
 // List logs
 cli.responders.listLogs = () => {
-  _logs.list(true,(err,logFileNames) => {
-    if(!err && logFileNames && logFileNames.length > 0){
+  _logs.list(true, (err, logFileNames) => {
+    if (!err && logFileNames && logFileNames.length > 0) {
       cli.verticalSpace();
       logFileNames.forEach((logFileName) => {
-        if(logFileName.indexOf('-') > -1){
+        if (logFileName.indexOf('-') > -1) {
           console.log(logFileName);
           cli.verticalSpace();
         }
@@ -213,7 +214,25 @@ cli.responders.listLogs = () => {
 
 // More logs info
 cli.responders.moreLogInfo = (str) => {
-  console.log("You asked for more logs info", str);
+  //Get the logFileName from the string
+  let arr = str.split('--');
+  let logFileName = typeof (arr[1]) == 'string' && arr[1].trim().length > 0 ? arr[1].trim() : false;
+  if (logFileName) {
+    cli.verticalSpace();
+    _logs.decompress(logFileName, (err, strData) => {
+      if (!err && strData) {
+        //split into lines
+        let arr = strData.split('\n');
+        arr.forEach((jsonString) => {
+          let logObject = helpers.parseJsonToObject(jsonString);
+          if (logObject && JSON.stringify(logObject) !== '{}') {
+            console.dir(logObject, { 'colors': true });
+            cli.verticalSpace();
+          }
+        })
+      }
+    })
+  }
 };
 // Help / Man
 cli.responders.help = () => {
