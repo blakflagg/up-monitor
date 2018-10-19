@@ -13,6 +13,11 @@ const fs = require('fs');
 //Contain for the helpers
 let helpers = {};
 
+// Sample for testing 
+helpers.getANumber =  () =>{
+  return 1;
+};
+
 //Create a SHA256 hash
 helpers.hash = function (str) {
   if (typeof (str) == 'string' && str.length > 0) {
