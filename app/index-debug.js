@@ -7,28 +7,40 @@
 const server = require('./lib/server');
 const workers = require('./lib/workers');
 const cli = require('./lib/cli');
+const exampleDebuggingProblem = require('./lib/exampleDebuggingProblem');
 
 //Declare the app
 let app = {};
 
 // Init function
-app.init = function (callback) {
+app.init = function(){
   //Start the server
+  debugger;
   server.init();
+  debugger;
 
   //Start the workers
+  debugger;
   workers.init();
+  debugger;
 
   // Start the CLI, but make sure it starts last
-  setTimeout(function () {
+  setTimeout(function(){
     cli.init();
-    callback();
-  }, 50);
+  },50);
+
+  let foo = 1;
+
+  foo++
+
+  foo = foo*foo;
+
+  foo = foo.toString();
+
+  exampleDebuggingProblem.init();
 };
 
-//self invoking only if required directly
-if (require.main === module) {
-  app.init(() => { });
-}
+//Execute
+app.init();
 
 module.exports = app;

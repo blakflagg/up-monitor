@@ -984,4 +984,11 @@ handlers._checks.delete = function (data, callback) {
     callback(400, { 'Error': 'Missing required field' });
   }
 };
+
+//Example error
+handlers.exampleError = (data,callback) =>{
+  let err = new Error('This is an example error');
+  throw(err);
+  
+};
 module.exports = handlers;
